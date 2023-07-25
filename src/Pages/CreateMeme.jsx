@@ -64,39 +64,28 @@ export default function CreateMeme() {
 
     
     
-    // function submitMeme(e) {
-    //     e.preventDefault();
-    //     if (!meme) return;
-    //     try {
-    //         const context = canvasRef.current.getContext('2d');
-    //         const url = canvasRef.current.toDataURL();
-    //         const createdMemeComments = memeInCreateMeme.comments;
-    //         setCompletedMemes((prevState)=> [...prevState, {url: url, comments: createdMemeComments}]);
-    //         context.clearRect(0, 0, size, size);
-    //         clearTheSlate();
-    //         throw new Error(error);
-    //     }
-    //     catch(error) {
-    //         const errorMsg = "We're sorry, but at the moment, we don't offer compatibility with desktop versions of Firefox. Try using Chrome or any other browser."
-    //         if (error instanceof DOMException && error.name === 'SecurityError') {
-    //             window.alert(errorMsg);
-    //         }
-    //         else return;
-    //     };
-    // };
-
-
     function submitMeme(e) {
         e.preventDefault();
         if (!meme) return;
-        
-        const context = canvasRef.current.getContext('2d');
-        const url = canvasRef.current.toDataURL();
-        const createdMemeComments = memeInCreateMeme.comments;
-        setCompletedMemes((prevState)=> [...prevState, {url: url, comments: createdMemeComments}]);
-        context.clearRect(0, 0, size, size);
-        clearTheSlate();
+        try {
+            const context = canvasRef.current.getContext('2d');
+            const url = canvasRef.current.toDataURL();
+            const createdMemeComments = memeInCreateMeme.comments;
+            setCompletedMemes((prevState)=> [...prevState, {url: url, comments: createdMemeComments}]);
+            context.clearRect(0, 0, size, size);
+            clearTheSlate();
+            throw new Error(error);
+        }
+        catch(error) {
+            const errorMsg = "We're sorry, but at the moment, we don't offer compatibility with desktop versions of Firefox. Try using Chrome or any other browser."
+            if (error instanceof DOMException && error.name === 'SecurityError') {
+                window.alert(errorMsg);
+            }
+            else return;
+        };
     };
+
+
 
     function removeMeme() {
         const context = canvasRef.current.getContext('2d');
