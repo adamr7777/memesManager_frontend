@@ -7,7 +7,7 @@ export function ContextProvider({children}) {
     const [memesData, setMemesData] = useState([]);
     const [memeInCreateMeme, setMemeInCreateMeme] = useState(null);
     const [completedMemes, setCompletedMemes] = useState([]);
-    const memeApi = 'http://localhost:5000/api/memesData';
+    const memeApi = 'https://memes-manager.onrender.com/api/memesData';
 
 
     useEffect(()=> {
