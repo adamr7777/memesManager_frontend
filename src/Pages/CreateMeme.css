@@ -1,0 +1,51 @@
+
+
+
+.container-joysticks {
+    display: flex;
+    justify-content: space-around;
+}
+
+
+.joystick-container {
+    
+    width: 150px; 
+    height: 150px; 
+    margin-bottom: 100px;
+  }
+
+  .joystick-text {
+    position: relative;
+    top: 105px;
+    left: 53px;
+    width: 48px;
+  }
+  
+  .joystick {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .joystick-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .btn-joystick {
+    width: 30px; 
+    height: 30px; 
+    margin: 5px;
+  }
+  
+  .arrow {
+    font-size: 15px; 
+  }
+  
