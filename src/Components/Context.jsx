@@ -8,6 +8,8 @@ export function ContextProvider({children}) {
     const [memeInCreateMeme, setMemeInCreateMeme] = useState(null);
     const [completedMemes, setCompletedMemes] = useState([]);
     const memeApi = 'https://memes-manager.onrender.com/api/memesData';
+    const devUrl = 'http://localhost:5000/api/memesData';
+    const loginModal = useState(false);
 
 
     useEffect(()=> {
@@ -19,7 +21,7 @@ export function ContextProvider({children}) {
                     setMemesData(localData);
                 } 
                 else {
-                    const response = await fetch(memeApi);
+                    const response = await fetch(devUrl);
                     const data = await response.json();
                     const memes = data.data.map((item)=> {
                         return {
