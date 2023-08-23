@@ -5,7 +5,8 @@ import {ContextObj} from './Context';
 
 
 export default function LoginModal() {
-    const {registerUser, loginUser} = useContext(ContextObj);
+    const {registerUser, loginUser, userHasLoggedIn} = useContext(ContextObj);
+    
 
     const titleObj = {
         login: 'Login', 
@@ -21,6 +22,7 @@ export default function LoginModal() {
 
 
     const styles = {
+        display: userHasLoggedIn? 'none' : 'block',
         position: 'fixed',
         top: '30%',
         right: '40%',
@@ -47,7 +49,11 @@ export default function LoginModal() {
     const handleSubmit = (e)=> {
         e.preventDefault();
 
-        if(title === titleObj.login) loginUser(username, password);
+        if(title === titleObj.login) {
+            loginUser(username, password);
+            // const verificationComplete = await loginUser(username, password);
+            // if(verificationComplete) setUserHasLoggedIn(true);
+        }
         else if(title === titleObj.register) registerUser(username, password);
 
         if(title === titleObj.register) {

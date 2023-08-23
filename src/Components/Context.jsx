@@ -7,41 +7,17 @@ export function ContextProvider({children}) {
     const [memesData, setMemesData] = useState([]);
     const [memeInCreateMeme, setMemeInCreateMeme] = useState(null);
     const [completedMemes, setCompletedMemes] = useState([]);
+    const [userHasLoggedIn, setUserHasLoggedIn] = useState(false);
+    const [attemptToLoggIn, setAttemptToLoggIn] = useState(false);
     const memeApi = 'https://memes-manager.onrender.com/api/memesData';
     const devUrl = 'http://localhost:5000/api/memesData';
-    const loginModal = useState(false);
+    // const loginModal = useState(false);
+    
 
 
     useEffect(()=> {
-        
-        (async function() {
-            try {
-                if (localStorage.getItem('memesData')) {
-                    const localData = JSON.parse(localStorage.getItem('memesData'));
-                    setMemesData(localData);
-                } 
-                else {
-                    const response = await fetch(devUrl);
-                    const data = await response.json();
-                    const memes = data.data.map((item)=> {
-                        return {
-                            id: item.id,
-                            origin: 'api',
-                            url: item.url,
-                            liked: false,
-                            favorite: false,
-                            comments: [],
-                        };
-                    });
-                    setMemesData(memes);
-                    localStorage.setItem('memesData', JSON.stringify(memesData));
-                };
-            }
-            catch(error) {
-                alert(error);
-            };
-        }) ();
-    }, []);
+        fetchData();
+    }, [attemptToLoggIn]);
 
     useEffect(()=> {
         localStorage.setItem('memesData', JSON.stringify(memesData));
@@ -59,6 +35,51 @@ export function ContextProvider({children}) {
     useEffect(()=> {
         localStorage.setItem('completedMemes', JSON.stringify(completedMemes));
     }, [completedMemes]);
+
+    async function fetchData() {
+        try {
+            if (localStorage.getItem('memesData')) {
+                const localData = JSON.parse(localStorage.getItem('memesData'));
+                setMemesData(localData);
+                //////remove/////
+                if(localStorage.getItem('token')) setUserHasLoggedIn(true);
+                //////remove/////
+            } 
+            else {
+                const token = JSON.parse(localStorage.getItem('token'));
+                if(!token) return;
+
+                const pref = {
+                    method: 'GET',
+                    headers: {
+                      'Authorization': token,
+                      'Custom-Header': 'custom-value'
+                    }
+                };
+
+                const response = await fetch(devUrl, pref);
+                const data = await response.json();
+
+                if (data) setUserHasLoggedIn(true);
+
+                const memes = data.data.map((item)=> {
+                    return {
+                        id: item.id,
+                        origin: 'api',
+                        url: item.url,
+                        liked: false,
+                        favorite: false,
+                        comments: [],
+                    };
+                });
+                setMemesData(memes);
+                localStorage.setItem('memesData', JSON.stringify(memesData));
+            };
+        }
+        catch(error) {
+            alert(error);
+        };
+    };
 
 
     function likeMeme(memeIndex) {
@@ -141,7 +162,7 @@ export function ContextProvider({children}) {
     };
 
     async function loginUser(username, password) {            //API///////////////////////////////////
-        // console.log(`${username} is logged in`);
+        console.log(`${username} is logged in`);
         const registerUrl = 'http://localhost:5000/authorise/login';
         const options = {
             method: 'POST',
@@ -155,45 +176,44 @@ export function ContextProvider({children}) {
 
         const res = await fetch(registerUrl, options)
         const data = await res.json();
+        
+        const {token} = data;
+        localStorage.setItem('token', JSON.stringify(token));
 
+        setAttemptToLoggIn(true);
+        
         //////////change//////////////////////
         
         localStorage.removeItem('memesData');
         localStorage.removeItem('completedMemes');
         
-        const {token} = data;
-        const pref = {
-            method: 'GET',
-            headers: {
-              'Authorization': token,
-              'Custom-Header': 'custom-value'
-            }
-        };
+        
 
-        const response = await fetch('http://localhost:5000/api/memesData', pref);
-        const dataMemes = await response.json();
-        const memes = dataMemes.data.map((item)=> {
-            return {
-                id: item.id,
-                origin: 'api',
-                url: item.url,
-                liked: false,
-                favorite: false,
-                comments: [],
-            };
-        });
-        setMemesData(memes);
-        localStorage.setItem('memesData', JSON.stringify(memesData));
+        // const response = await fetch('http://localhost:5000/api/memesData', pref);
+        // const dataMemes = await response.json();
+        // const memes = dataMemes.data.map((item)=> {
+        //     return {
+        //         id: item.id,
+        //         origin: 'api',
+        //         url: item.url,
+        //         liked: false,
+        //         favorite: false,
+        //         comments: [],
+        //     };
+        // });
+        // setMemesData(memes);
+        // localStorage.setItem('memesData', JSON.stringify(memesData));
 
 
         //////////change//////////////////////
+        // if(dataMemes) return true;
     };
 
     
     return (
         <ContextObj.Provider value={{memesData, memeInCreateMeme, completedMemes, 
             setMemesData, setCompletedMemes, setMemeInCreateMeme, likeMeme, commentMeme, favoriteMeme, removeMeme, 
-            registerUser, loginUser}}>
+            registerUser, loginUser, userHasLoggedIn}}>
             {children}
         </ContextObj.Provider>
     );
