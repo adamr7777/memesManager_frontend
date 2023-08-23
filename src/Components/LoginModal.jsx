@@ -1,17 +1,23 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 
 import './LoginModal.css';
-
+import {ContextObj} from './Context';
 
 
 export default function LoginModal() {
+    const {registerUser, loginUser} = useContext(ContextObj);
+
     const titleObj = {
         login: 'Login', 
         register: 'Register', 
         registrationCompleted: 'registration completed,  please go to login section'
     };
-
+    
     const [title, setTitle] = useState(titleObj.login);
+    
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
 
 
     const styles = {
@@ -38,6 +44,22 @@ export default function LoginModal() {
         });
     };
 
+    const handleSubmit = (e)=> {
+        e.preventDefault();
+
+        if(title === titleObj.login) loginUser(username, password);
+        else if(title === titleObj.register) registerUser(username, password);
+
+        if(title === titleObj.register) {
+            setTitle(titleObj.registrationCompleted);
+        };
+
+        setUsername('');
+        setPassword('');
+    };
+
+    const isDisabled = title === titleObj.registrationCompleted? true : false;
+
 
     return (
         <>
@@ -46,14 +68,18 @@ export default function LoginModal() {
                     <h5 style={titleColor }>{title}</h5>
                     <div className='form-row'>
                         <label htmlFor='username' className='form-label'>username</label>
-                        <input type='text' className='form-input username-input' />
+                        <input type='text' value= {username} className='form-input username-input' 
+                            onChange={(e)=> setUsername(e.target.value)}/>
                     </div>
                     <div className='form-row'>
                         <label htmlFor='password' className='form-label'>password</label>
-                        <input type='password' className='form-input password-input' />
+                        <input type='password' value= {password} className='form-input password-input' 
+                            onChange={(e)=> setPassword(e.target.value)}/>
                     </div>
                     <div className='text-small form-alert'>there was an error</div>
-                    <button type='submit' className='btn-form btn btn-danger btn-block'>submit</button>
+                    <button type='submit' onClick={handleSubmit} disabled={isDisabled} className='btn-form btn btn-danger btn-block'>
+                        {title === titleObj.login? 'login' : 'register'}
+                    </button>
                     <button style={registerBtnStyles} onClick={handleGoToRegister}>
                         {title === titleObj.login? 'register' : 'login'}
                     </button>

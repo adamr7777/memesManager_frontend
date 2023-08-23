@@ -122,10 +122,78 @@ export function ContextProvider({children}) {
         };
     };
 
+    async function registerUser(username, password) {       //API///////////////////////////////////
+        // console.log(`${username} is registered`);
+        const registerUrl = 'http://localhost:5000/authorise/register';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "auth": {username, password}
+              })
+        };
+
+        const res = await fetch(registerUrl, options)
+        const data = await res.json();
+        console.log(data);
+    };
+
+    async function loginUser(username, password) {            //API///////////////////////////////////
+        // console.log(`${username} is logged in`);
+        const registerUrl = 'http://localhost:5000/authorise/login';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "auth": {username, password}
+              })
+        };
+
+        const res = await fetch(registerUrl, options)
+        const data = await res.json();
+
+        //////////change//////////////////////
+        
+        localStorage.removeItem('memesData');
+        localStorage.removeItem('completedMemes');
+        
+        const {token} = data;
+        const pref = {
+            method: 'GET',
+            headers: {
+              'Authorization': token,
+              'Custom-Header': 'custom-value'
+            }
+        };
+
+        const response = await fetch('http://localhost:5000/api/memesData', pref);
+        const dataMemes = await response.json();
+        const memes = dataMemes.data.map((item)=> {
+            return {
+                id: item.id,
+                origin: 'api',
+                url: item.url,
+                liked: false,
+                favorite: false,
+                comments: [],
+            };
+        });
+        setMemesData(memes);
+        localStorage.setItem('memesData', JSON.stringify(memesData));
+
+
+        //////////change//////////////////////
+    };
+
     
     return (
         <ContextObj.Provider value={{memesData, memeInCreateMeme, completedMemes, 
-            setMemesData, setCompletedMemes, setMemeInCreateMeme, likeMeme, commentMeme, favoriteMeme, removeMeme}}>
+            setMemesData, setCompletedMemes, setMemeInCreateMeme, likeMeme, commentMeme, favoriteMeme, removeMeme, 
+            registerUser, loginUser}}>
             {children}
         </ContextObj.Provider>
     );
