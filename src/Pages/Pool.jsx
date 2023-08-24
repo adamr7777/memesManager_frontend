@@ -3,7 +3,8 @@ import React, {useContext} from 'react';
 import Meme from '../Components/Meme';
 import BackToTopBtn from '../Components/BackToTopBtn';
 import {ContextObj} from '../Components/Context';
-
+import LoginModal from '../Components/LoginModal';
+import UserDisplay from '../Components/UserDisplay';
 
 
 
@@ -32,6 +33,8 @@ export default function Pool() {
             <div className='grid-container' style={gridStyles}>
                 {memes}
                 <BackToTopBtn/>
+                <LoginModal/>
+                <UserDisplay/> 
             </div>
     );
 };
