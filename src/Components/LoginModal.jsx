@@ -7,7 +7,7 @@ import {ContextObj} from './Context';
 export default function LoginModal() {
     const {registerUser, loginUser, userHasLoggedIn} = useContext(ContextObj);
     
-
+    
     const titleObj = {
         login: 'Login', 
         register: 'Register', 
@@ -18,7 +18,8 @@ export default function LoginModal() {
     
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
+    
+    const isDisabled = title === titleObj.registrationCompleted? true : false;
 
 
     const styles = {
@@ -64,7 +65,8 @@ export default function LoginModal() {
         setPassword('');
     };
 
-    const isDisabled = title === titleObj.registrationCompleted? true : false;
+   
+
 
 
     return (

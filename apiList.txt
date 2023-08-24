@@ -1,0 +1,4 @@
+Context.jsx >>>
+    1. in fetchData
+    2. in registerUser
+    3. in loginsUser
