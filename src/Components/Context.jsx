@@ -22,6 +22,7 @@ export function ContextProvider({children}) {
     }, [attemptToLoggIn]);
 
     useEffect(()=> {
+        if(!memesData[0]) return;
         localStorage.setItem('memesData', JSON.stringify(memesData));
     }, [memesData]);
 
@@ -40,16 +41,18 @@ export function ContextProvider({children}) {
 
     async function fetchData() {
         try {
-            if(!localStorage.getItem('token')) return;
+            if(!localStorage.getItem('user')) return;
             if (localStorage.getItem('memesData')) {
                 const localData = JSON.parse(localStorage.getItem('memesData'));
                 setMemesData(localData);
                 //////remove/////
-                if(localStorage.getItem('token')) setUserHasLoggedIn(true);
+                if(localStorage.getItem('user')) setUserHasLoggedIn(true);
+                const user = JSON.parse(localStorage.getItem('user'));
+                setUser(user);
                 //////remove/////
             } 
             else {
-                const token = JSON.parse(localStorage.getItem('token'));
+                const {token} = JSON.parse(localStorage.getItem('user'));
                 if(!token) return;
 
                 const endPoint = '/api/memesData';
@@ -180,16 +183,16 @@ export function ContextProvider({children}) {
 
         const res = await fetch(url + endpoint, options)           //3.API///////////////////////////////////
         const data = await res.json();
-        
+        console.log(data.username);
         const {token} = data;
-        localStorage.setItem('token', JSON.stringify(token));
+        localStorage.setItem('user', JSON.stringify({username: data.username, token}));
 
         setAttemptToLoggIn(true);
         
         //////////change//////////////////////
         
-        localStorage.removeItem('memesData');
-        localStorage.removeItem('completedMemes');
+        // localStorage.removeItem('memesData');
+        // localStorage.removeItem('completedMemes');
     };
 
     
