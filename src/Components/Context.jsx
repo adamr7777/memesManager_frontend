@@ -4,16 +4,16 @@ import React, {createContext, useState, useEffect} from 'react';
 export const ContextObj = createContext();
 
 export function ContextProvider({children}) {
-    const [memesData, setMemesData] = useState([]);
+    const [memesData, setMemesData] = useState([]); //data 1
     const [memeInCreateMeme, setMemeInCreateMeme] = useState(null);
-    const [completedMemes, setCompletedMemes] = useState([]);
+    const [completedMemes, setCompletedMemes] = useState([]); //data 2
     const [userHasLoggedIn, setUserHasLoggedIn] = useState(false);
     const [attemptToLoggIn, setAttemptToLoggIn] = useState(false);
     const [user, setUser] = useState(null);
     const deployApi = 'https://memes-manager.onrender.com';
     const devApi = 'http://localhost:5000';
 
-    const url = deployApi;
+    const url = devApi;
     
 
 
@@ -22,39 +22,41 @@ export function ContextProvider({children}) {
     }, [attemptToLoggIn]);
 
     useEffect(()=> {
-        if(!memesData[0]) return;
-        localStorage.setItem('memesData', JSON.stringify(memesData));
+        if(!memesData[0]) return
+        const mainMemes = 'mainMemes';
+        updateMemesDataDb(mainMemes);
     }, [memesData]);
 
 
-    useEffect(()=> {
-        if (!localStorage.getItem('completedMemes')) return;
-        else {
-            const localData = JSON.parse(localStorage.getItem('completedMemes'));
-            setCompletedMemes(localData);
-        };
-    }, []);
 
     useEffect(()=> {
-        localStorage.setItem('completedMemes', JSON.stringify(completedMemes));
+        if(!completedMemes[0]) return
+        const secMemes = 'secMemes';
+        updateMemesDataDb(secMemes );
     }, [completedMemes]);
+
+    useEffect(()=> {
+            getMemesDataDb();
+    }, []);
+
+    
 
     async function fetchData() {
         try {
-            if(!localStorage.getItem('user')) return;
-            if (localStorage.getItem('memesData')) {
-                const localData = JSON.parse(localStorage.getItem('memesData'));
-                setMemesData(localData);
-                //////remove/////
-                if(localStorage.getItem('user')) setUserHasLoggedIn(true);
-                const user = JSON.parse(localStorage.getItem('user'));
-                setUser(user);
-                //////remove/////
-            } 
+            if(!localStorage.getItem('userData')) return;
+            const dataExists = await getMemesDataDb();
+            if(dataExists) {
+                if(localStorage.getItem('userData')) {
+                    const userData = JSON.parse(localStorage.getItem('userData'))
+                    setUserHasLoggedIn(true);
+                    setUser({username: userData.personName});
+                };
+            }
             else {
-                const {token} = JSON.parse(localStorage.getItem('user'));
-                if(!token) return;
-
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                if(!userData) return;
+                
+                const {token} = userData;
                 const endPoint = '/api/memesData';
 
                 const pref = {
@@ -67,7 +69,8 @@ export function ContextProvider({children}) {
 
                 const response = await fetch(url + endPoint, pref);     //1.API///////////////////////////////////
                 const data = await response.json();
-                if (data.user) {                //used to be if(data)
+    
+                if (data.user) {                
                     setUserHasLoggedIn(true);    
                     setUser(data.user);
                 }; 
@@ -83,7 +86,6 @@ export function ContextProvider({children}) {
                     };
                 });
                 setMemesData(memes);
-                localStorage.setItem('memesData', JSON.stringify(memesData));
             };
         }
         catch(error) {
@@ -91,6 +93,82 @@ export function ContextProvider({children}) {
         };
     };
 
+    async function getMemesDataDb() {
+        if(!JSON.parse(localStorage.getItem('userData'))) return;
+        const endPoint = '/api/userData/mainUserData/';
+        const {personName} = JSON.parse(localStorage.getItem('userData'));
+    
+        try {
+            const res = await fetch(url + endPoint + personName);
+            const memesData = await res.json();
+            if(memesData.data.userMemes[0]) { 
+                setMemesData(memesData.data.userMemes);
+                completedMemes, setCompletedMemes
+                if(memesData.data.secMemes[0]) setCompletedMemes(memesData.data.secMemes);
+                return true;
+            }
+            else return false
+        } catch(err) {
+            console.error(err);
+        }
+    };
+
+    async function updateMemesDataDb(prompt) {    //2.API///////////////////////////////////
+
+        if(!JSON.parse(localStorage.getItem('userData'))) return;
+        const endPoint = '/api/userData/mainUserData';
+        const {personName, encryptedPwd} = JSON.parse(localStorage.getItem('userData'));
+        const mainMemes = 'mainMemes';
+        const secMemes = 'secMemes';
+
+        const content = prompt === mainMemes ? {
+            username: personName, 
+            encryptedPwd,  
+            userMemes: memesData,
+        } : {
+            username: personName, 
+            encryptedPwd,  
+            secMemes: completedMemes
+        }
+
+        const pref = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userData: content
+              })
+        };
+
+        await fetch(url + endPoint, pref);
+    };
+
+    async function resetUserDataDb() {
+        const {personName, encryptedPwd} = JSON.parse(localStorage.getItem('userData'));
+
+        const endPoint = '/api/userData/mainUserData';
+
+        const content = {
+        username: personName, 
+        encryptedPwd,  
+        userMemes: [],
+        secMemes: []
+        }; 
+
+        const pref = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userData: content
+              })
+        };
+
+        await fetch(url + endPoint, pref);
+
+    }    
 
     function likeMeme(memeIndex) {
         setMemesData((prev)=> prev.map((item, index)=> {
@@ -165,8 +243,9 @@ export function ContextProvider({children}) {
               })
         };
 
-        const res = await fetch(url + endpoint, options);      //2.API///////////////////////////////////
+        const res = await fetch(url + endpoint, options);      //3.API///////////////////////////////////
         const data = await res.json();
+        if (data.msg) return alert(data.msg);
     };
 
     async function loginUser(username, password) {           
@@ -181,25 +260,23 @@ export function ContextProvider({children}) {
               })
         };
 
-        const res = await fetch(url + endpoint, options)           //3.API///////////////////////////////////
+        const res = await fetch(url + endpoint, options)           //4.API///////////////////////////////////
         const data = await res.json();
-        console.log(data.username);
-        const {token} = data;
-        localStorage.setItem('user', JSON.stringify({username: data.username, token}));
+        
+        if (data.msg) return alert(data.msg);
+        const {personName, encryptedPwd, token} = data;
+        localStorage.setItem('userData', JSON.stringify({personName, encryptedPwd, token}));
 
         setAttemptToLoggIn(true);
-        
-        //////////change//////////////////////
-        
-        // localStorage.removeItem('memesData');
-        // localStorage.removeItem('completedMemes');
     };
 
     
+
+
     return (
         <ContextObj.Provider value={{memesData, memeInCreateMeme, completedMemes, 
             setMemesData, setCompletedMemes, setMemeInCreateMeme, likeMeme, commentMeme, favoriteMeme, removeMeme, 
-            registerUser, loginUser, userHasLoggedIn, setUserHasLoggedIn, user}}>
+            registerUser, loginUser, userHasLoggedIn, setUserHasLoggedIn, user, resetUserDataDb}}>
             {children}
         </ContextObj.Provider>
     );

@@ -51,23 +51,20 @@ export default function LoginModal() {
         e.preventDefault();
 
         if(title === titleObj.login) {
+            if (!username) return alert('Please Enter the Username');
+            if (!password) return alert('Please Enter the Password');
             loginUser(username, password);
-            // const verificationComplete = await loginUser(username, password);
-            // if(verificationComplete) setUserHasLoggedIn(true);
         }
-        else if(title === titleObj.register) registerUser(username, password);
-
-        if(title === titleObj.register) {
+        else if(title === titleObj.register) {
+            if (!username) return alert('Please Enter the Username');
+            if (!password) return alert('Please Enter the Password');
+            registerUser(username, password);
             setTitle(titleObj.registrationCompleted);
-        };
+        }; 
 
         setUsername('');
         setPassword('');
     };
-
-   
-
-
 
     return (
         <>

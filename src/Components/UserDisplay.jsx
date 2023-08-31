@@ -10,7 +10,7 @@ export default function UserDisplay() {
     
     const [UserDisplay, setUserDisplay] = useState(false);
     const [upBtnClicked, setUpBtnClicked] = useState(false);
-    
+
     const username = user? user.username : '';
     const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ export default function UserDisplay() {
     };
 
     const handleLogout = ()=> {
-        localStorage.removeItem('user');
+        localStorage.removeItem('userData');
         navigate('/');
         window.location.reload();
     };

@@ -1,13 +1,15 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 
+import {ContextObj} from './Context';
 
 export default function Header() {
     const navigate = useNavigate();
    
+    const {resetUserDataDb} = useContext(ContextObj);
+
     function resetAll() {
-        localStorage.removeItem('memesData');
-        localStorage.removeItem('completedMemes');
+        resetUserDataDb()
         navigate('/');
         window.location.reload();
     };
