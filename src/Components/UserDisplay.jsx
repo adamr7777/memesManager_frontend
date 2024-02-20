@@ -6,11 +6,11 @@ import {ContextObj} from './Context';
 
 
 export default function UserDisplay() {
-    const {userHasLoggedIn, user} = useContext(ContextObj);
+    const {userHasLoggedIn, user, deleteAccount} = useContext(ContextObj);
     
     const [UserDisplay, setUserDisplay] = useState(false);
     const [upBtnClicked, setUpBtnClicked] = useState(false);
-    
+
     const username = user? user.username : '';
     const navigate = useNavigate();
 
@@ -26,10 +26,22 @@ export default function UserDisplay() {
         display: upBtnClicked? 'block' : UserDisplay? 'block' : 'none'
     };
 
+
     const handleLogout = ()=> {
-        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
         navigate('/');
         window.location.reload();
+    };
+
+    const handleDelete = async ()=> {
+        const result = window.confirm('Are you sure you want to permamently delete your account?');
+        if(!result) return;
+        const data = await deleteAccount();
+        if(data.msg === 'success!') {
+            alert(`User ${data.personName} deleted`);
+            handleLogout();
+        }
+        else alert('Error, try again');
     };
 
     return (
@@ -48,6 +60,7 @@ export default function UserDisplay() {
                 onMouseOver={()=> setUserDisplay(true)}
                 onMouseOut={()=> setUserDisplay(false)}
                 onClick={()=> setUpBtnClicked((prevState)=> !prevState)}>User</button>
+                <button className='btn-delete' style={containerStyles} onClick={handleDelete}>Delete your Account</button>
             </main>}
         </>
     );

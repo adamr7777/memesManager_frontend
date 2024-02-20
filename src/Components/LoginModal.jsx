@@ -25,8 +25,9 @@ export default function LoginModal() {
     const styles = {
         display: userHasLoggedIn? 'none' : 'block',
         position: 'fixed',
-        top: '30%',
-        right: '40%',
+        top: '50%',
+        right: '50%',
+        transform: 'translate(50%, -50%)',
         border: '4px solid #6c757d',
     };
     
@@ -51,29 +52,26 @@ export default function LoginModal() {
         e.preventDefault();
 
         if(title === titleObj.login) {
+            if (!username) return alert('Please Enter the Username');
+            if (!password) return alert('Please Enter the Password');
             loginUser(username, password);
-            // const verificationComplete = await loginUser(username, password);
-            // if(verificationComplete) setUserHasLoggedIn(true);
         }
-        else if(title === titleObj.register) registerUser(username, password);
-
-        if(title === titleObj.register) {
+        else if(title === titleObj.register) {
+            if (!username) return alert('Please Enter the Username');
+            if (!password) return alert('Please Enter the Password');
+            registerUser(username, password);
             setTitle(titleObj.registrationCompleted);
-        };
+        }; 
 
         setUsername('');
         setPassword('');
     };
 
-   
-
-
-
     return (
         <>
             <main style={styles}>
                 <form className='form contact-form'>
-                    <h5 style={titleColor }>{title}</h5>
+                    <h5 style={titleColor}>{title}</h5>
                     <div className='form-row'>
                         <label htmlFor='username' className='form-label'>username</label>
                         <input type='text' value= {username} className='form-input username-input' 

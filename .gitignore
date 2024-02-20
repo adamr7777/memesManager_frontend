@@ -13,6 +13,7 @@ dist
 *.local
 
 # Editor directories and files
+alternative_UI
 .vscode/*
 !.vscode/extensions.json
 .idea
