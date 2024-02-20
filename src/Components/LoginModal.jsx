@@ -25,8 +25,9 @@ export default function LoginModal() {
     const styles = {
         display: userHasLoggedIn? 'none' : 'block',
         position: 'fixed',
-        top: '30%',
-        right: '40%',
+        top: '50%',
+        right: '50%',
+        transform: 'translate(50%, -50%)',
         border: '4px solid #6c757d',
     };
     
@@ -70,7 +71,7 @@ export default function LoginModal() {
         <>
             <main style={styles}>
                 <form className='form contact-form'>
-                    <h5 style={titleColor }>{title}</h5>
+                    <h5 style={titleColor}>{title}</h5>
                     <div className='form-row'>
                         <label htmlFor='username' className='form-label'>username</label>
                         <input type='text' value= {username} className='form-input username-input' 

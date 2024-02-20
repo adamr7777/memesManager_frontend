@@ -13,7 +13,7 @@ export function ContextProvider({children}) {
     const deployApi = 'https://memes-manager.onrender.com';
     const devApi = 'http://localhost:5000';
 
-    const url = devApi;
+    const url = deployApi;
     
 
 
@@ -270,13 +270,37 @@ export function ContextProvider({children}) {
         setAttemptToLoggIn(true);
     };
 
+    const deleteAccount = async ()=> {
+        if(!localStorage.getItem('userData')) return;
+        const endPoint = '/api/deleteUser/';
+        const {personName} = JSON.parse(localStorage.getItem('userData'));
+        const pref = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+
+        try {
+            const res = await fetch(url + endPoint + personName, pref);
+            const data = await res.json();
+
+            const {msg} = data;
+            return {msg, personName};
+
+        } catch(err) {
+            conso.error(err);
+        };
+
+    };
+
     
 
 
     return (
         <ContextObj.Provider value={{memesData, memeInCreateMeme, completedMemes, 
             setMemesData, setCompletedMemes, setMemeInCreateMeme, likeMeme, commentMeme, favoriteMeme, removeMeme, 
-            registerUser, loginUser, userHasLoggedIn, setUserHasLoggedIn, user, resetUserDataDb}}>
+            registerUser, loginUser, userHasLoggedIn, setUserHasLoggedIn, user, resetUserDataDb, deleteAccount}}>
             {children}
         </ContextObj.Provider>
     );
